@@ -121,10 +121,22 @@ function vThemen(){
     h+='<section class="ifsec"><div class="ifhead"><span class="no">IF '+no+'</span><h2>'+IFS[no].t+'</h2></div>';
     if(IFS[no].dossier){
       const idos=IFS[no].dossier;
-      h+='<details class="card if-dossier-card" style="margin-bottom:14px"><summary class="if-dossier-sum" style="cursor:pointer"><div class="row" style="gap:8px"><span class="chip sk">📖 Epochen-Überblick &amp; Leitfaden IF '+no+'</span><span class="spacer"></span><span class="small muted noprint">Aufklappen / Zuklappen</span></div></summary><div style="margin-top:12px"><p class="leitfrage" style="margin:4px 0 10px"><b>Leitfrage:</b> '+esc(idos.leitfrage)+'</p><div class="dossier-text small" style="line-height:1.6;color:var(--body)">'+esc(idos.epochenueberblick)+'</div><div class="note small" style="margin-top:10px"><b>Abiturleitfaden 2027 LK:</b> '+esc(idos.abiturleitfaden)+'</div></div></details>';
+      h+='<details class="if-dossier-card"><summary class="if-dossier-sum"><div class="sum-left"><span class="chip sk">📖 Epochen-Überblick &amp; Leitfaden IF '+no+'</span></div><div class="sum-toggle noprint"><span class="sum-label-closed">Aufklappen</span><span class="sum-label-open">Zuklappen</span><svg class="sum-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div></summary><div class="if-dossier-content"><p class="leitfrage" style="margin:0 0 10px;font-size:16px"><b>Leitfrage:</b> '+esc(idos.leitfrage)+'</p><div class="dossier-text small" style="line-height:1.68;color:var(--ink)">'+esc(idos.epochenueberblick)+'</div><div class="note small" style="margin-top:12px"><b>🎯 Abiturleitfaden 2027 LK:</b> '+esc(idos.abiturleitfaden)+'</div></div></details>';
     }
     h+='<div class="tiles">';
-    list.forEach(sp=>{const st=spStats(sp);h+='<a class="tile" href="#/sp/'+sp.id+'"><div class="top">'+ring(st.p,50)+'<div class="tt">'+sp.t+'</div></div><div class="q">'+sp.q+'</div><div class="ft">'+(sp.fokus.length?'<span class="chip fokus">★ Fokus 2027</span>':'')+'<span class="chip">'+sp.ke.length+' Kompetenzerwartungen</span>'+(st.set<st.n?'<span class="chip zum">'+(st.n-st.set)+' offen</span>':'')+'</div></a>';});
+    list.forEach(sp=>{
+      const st=spStats(sp);
+      const no=spNo(sp);
+      h+='<a class="tile" href="#/sp/'+sp.id+'">'
+        +'<div class="tile-head"><span class="tile-num">Schwerpunkt '+no[0]+'</span>'+ring(st.p,40)+'</div>'
+        +'<div class="tt">'+sp.t+'</div>'
+        +'<div class="q">'+sp.q+'</div>'
+        +'<div class="ft">'
+        +(sp.fokus.length?'<span class="chip fokus">★ Fokus 2027</span>':'')
+        +'<span class="chip">'+sp.ke.length+' Erwartungen</span>'
+        +(st.set<st.n?'<span class="chip zum">'+(st.n-st.set)+' offen</span>':'')
+        +'</div></a>';
+    });
     h+='</div></section>';
   });
   return h+foot();
@@ -134,7 +146,7 @@ function dossierHtml(sp){
   const d=sp.dossier;
   if(!d)return '';
   const paras=d.ueberblick.split('\n\n').map(p=>'<p>'+esc(p)+'</p>').join('');
-  let h='<details class="card dossier-card" open><summary class="dossier-summary"><div class="row" style="cursor:pointer;gap:8px"><span class="chip sk">📖 Fachwissenschaftliches Dossier</span><span class="chip fokus">Abitur 2027 LK</span>'+(sp.lk?'<span class="chip" style="background:#5e17eb;color:#fff">Nur Leistungskurs</span>':'')+'<span class="spacer"></span><span class="small muted noprint">Einklappen / Ausklappen</span></div></summary><div class="dossier-content" style="margin-top:14px">';
+  let h='<details class="dossier-card" open><summary class="dossier-summary"><div class="row" style="cursor:pointer;gap:8px"><span class="chip sk">📖 Fachwissenschaftliches Dossier</span><span class="chip fokus">Abitur 2027 LK</span>'+(sp.lk?'<span class="chip" style="background:#5e17eb;color:#fff">Nur Leistungskurs</span>':'')+'<span class="spacer"></span><div class="sum-toggle noprint"><span class="sum-label-closed">Dossier öffnen</span><span class="sum-label-open">Dossier schließen</span><svg class="sum-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div></div></summary><div class="dossier-content" style="margin-top:14px">';
   if(d.hook){
     h+='<blockquote class="dossier-hook"><p class="dossier-quote">„'+esc(d.hook.zitat)+'“</p><cite class="dossier-cite">— '+esc(d.hook.quelle)+'</cite></blockquote>';
     h+='<p class="dossier-q"><b>Orientierungsfrage:</b> '+esc(d.hook.frage)+'</p>';
