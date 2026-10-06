@@ -86,7 +86,7 @@ const PH={A:['Zyklus 1 · Überblick','ph-A'],B:['Zyklus 2 · Vertiefen','ph-B']
 function taskLi(t){const d=!!S.done[t.id];const h=taskHref(t);return '<li class="task'+(d?' done':'')+'"><input type="checkbox" id="t-'+esc(t.id)+'" data-act="task" data-id="'+esc(t.id)+'"'+(d?' checked':'')+'><div class="lbl"><label for="t-'+esc(t.id)+'" class="sr">erledigt</label>'+(h?'<a href="'+h+'">'+esc(t.label)+'</a>':esc(t.label))+'<div class="meta">ca. '+t.min+' Min.</div></div></li>';}
 
 /* ---------- UI-Zustand ---------- */
-let TF='alle',TLF={if:0,ls:''},TLM='liste',ORD=null,LXF={q:'',bel:false,if:0},OPQ={cur:null,opts:[],ans:null,score:0,total:0},SES=null,DECK={d:'mix',f:0},RESET=false;
+let TF='alle',TLF={if:0,ls:''},TLM='liste',ORD=null,LXF={q:'',bel:false,if:0,tab:'begriffe'},OPQ={cur:null,opts:[],ans:null,score:0,total:0},SES=null,DECK={d:'mix',f:0},RESET=false;
 
 /* ---------- Bausteine ---------- */
 function ring(p,size){size=size||56;const r=22,c=2*Math.PI*r,o=c*(1-p),pc=Math.round(p*100);return '<svg class="ring" width="'+size+'" height="'+size+'" viewBox="0 0 54 54" role="img" aria-label="'+pc+' Prozent"><circle class="bg" cx="27" cy="27" r="'+r+'" fill="none" stroke-width="6"/><circle class="fg" cx="27" cy="27" r="'+r+'" fill="none" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+c.toFixed(2)+'" stroke-dashoffset="'+o.toFixed(2)+'" transform="rotate(-90 27 27)"/><text x="27" y="31.5" text-anchor="middle">'+pc+'%</text></svg>';}
@@ -118,11 +118,46 @@ function vThemen(){
     if(TF==='fokus')list=list.filter(s=>s.fokus.length);
     if(TF==='luecken')list=list.filter(s=>s.ke.some(k=>(S.e[k.id]===undefined||S.e[k.id]<2)));
     if(!list.length)return;
-    h+='<section class="ifsec"><div class="ifhead"><span class="no">IF '+no+'</span><h2>'+IFS[no].t+'</h2></div><div class="tiles">';
+    h+='<section class="ifsec"><div class="ifhead"><span class="no">IF '+no+'</span><h2>'+IFS[no].t+'</h2></div>';
+    if(IFS[no].dossier){
+      const idos=IFS[no].dossier;
+      h+='<details class="card if-dossier-card" style="margin-bottom:14px"><summary class="if-dossier-sum" style="cursor:pointer"><div class="row" style="gap:8px"><span class="chip sk">📖 Epochen-Überblick &amp; Leitfaden IF '+no+'</span><span class="spacer"></span><span class="small muted noprint">Aufklappen / Zuklappen</span></div></summary><div style="margin-top:12px"><p class="leitfrage" style="margin:4px 0 10px"><b>Leitfrage:</b> '+esc(idos.leitfrage)+'</p><div class="dossier-text small" style="line-height:1.6;color:var(--body)">'+esc(idos.epochenueberblick)+'</div><div class="note small" style="margin-top:10px"><b>Abiturleitfaden 2027 LK:</b> '+esc(idos.abiturleitfaden)+'</div></div></details>';
+    }
+    h+='<div class="tiles">';
     list.forEach(sp=>{const st=spStats(sp);h+='<a class="tile" href="#/sp/'+sp.id+'"><div class="top">'+ring(st.p,50)+'<div class="tt">'+sp.t+'</div></div><div class="q">'+sp.q+'</div><div class="ft">'+(sp.fokus.length?'<span class="chip fokus">★ Fokus 2027</span>':'')+'<span class="chip">'+sp.ke.length+' Kompetenzerwartungen</span>'+(st.set<st.n?'<span class="chip zum">'+(st.n-st.set)+' offen</span>':'')+'</div></a>';});
     h+='</div></section>';
   });
   return h+foot();
+}
+
+function dossierHtml(sp){
+  const d=sp.dossier;
+  if(!d)return '';
+  const paras=d.ueberblick.split('\n\n').map(p=>'<p>'+esc(p)+'</p>').join('');
+  let h='<details class="card dossier-card" open><summary class="dossier-summary"><div class="row" style="cursor:pointer;gap:8px"><span class="chip sk">📖 Fachwissenschaftliches Dossier</span><span class="chip fokus">Abitur 2027 LK</span>'+(sp.lk?'<span class="chip" style="background:#5e17eb;color:#fff">Nur Leistungskurs</span>':'')+'<span class="spacer"></span><span class="small muted noprint">Einklappen / Ausklappen</span></div></summary><div class="dossier-content" style="margin-top:14px">';
+  if(d.hook){
+    h+='<blockquote class="dossier-hook"><p class="dossier-quote">„'+esc(d.hook.zitat)+'“</p><cite class="dossier-cite">— '+esc(d.hook.quelle)+'</cite></blockquote>';
+    h+='<p class="dossier-q"><b>Orientierungsfrage:</b> '+esc(d.hook.frage)+'</p>';
+  }
+  h+='<div class="dossier-text">'+paras+'</div>';
+  if(d.abiSpotlight){
+    h+='<div class="dossier-spotlight"><div class="eb">🎯 Abitur-Spotlight 2027 (Leistungskurs)</div>';
+    h+='<div class="spotlight-item"><b style="color:var(--gold-ink)">Fokus-Tipp:</b> '+esc(d.abiSpotlight.fokusTipp)+'</div>';
+    h+='<div class="spotlight-item"><b style="color:var(--heading)">Operatoren-Hinweis:</b> '+esc(d.abiSpotlight.operatorenHinweis)+'</div>';
+    h+='<div class="spotlight-item"><b style="color:var(--lv3)">Urteilsbildung (AFB III):</b> '+esc(d.abiSpotlight.urteilHinweis)+'</div>';
+    h+='</div>';
+  }
+  if(d.kontroverse){
+    h+='<div class="dossier-kontroverse"><div class="eb">⚖ Wissenschaftliche Kontroverse</div>';
+    h+='<h4 style="margin:4px 0 8px;color:var(--heading)">'+esc(d.kontroverse.name)+'</h4>';
+    h+='<div class="grid g2" style="gap:12px;margin-top:6px"><div class="col" style="background:var(--surface-2);padding:10px;border-radius:8px;border-left:3px solid var(--gold)"><b class="small" style="color:var(--gold-ink)">These:</b><p class="small" style="margin:4px 0 0">'+esc(d.kontroverse.these)+'</p></div><div class="col" style="background:var(--surface-2);padding:10px;border-radius:8px;border-left:3px solid var(--lv3)"><b class="small" style="color:var(--lv3)">Gegenposition:</b><p class="small" style="margin:4px 0 0">'+esc(d.kontroverse.gegenposition)+'</p></div></div></div>';
+  }
+  if(d.quellen&&d.quellen.length){
+    h+='<div class="dossier-sources"><div class="eb">🔍 Wissenschaftlich fundierte Quellen &amp; Vertiefungsportale</div>';
+    h+='<div class="source-tags">'+d.quellen.map(q=>'<a class="source-tag" href="'+esc(q.url)+'" target="_blank" rel="noopener"><span class="name">'+esc(q.name)+'</span><span class="inst">'+esc(q.institution)+' ↗</span></a>').join('')+'</div></div>';
+  }
+  h+='</div></details>';
+  return h;
 }
 
 function keHtml(k){
@@ -138,7 +173,9 @@ function vSP(id){
   const st=spStats(sp),no=spNo(sp);
   let chips='<div class="chips">'+sp.fokus.map(f=>'<span class="chip fokus" title="Fokussierung 2027">★ '+f+'</span>').join('')+'</div>';
   let h=phead('Inhaltsfeld '+sp.if+' · Schwerpunkt '+no[0]+' von '+no[1]+(sp.lk?' · nur Leistungskurs':''),sp.t,sp.q,chips);
-  h+='<div class="sp-layout"><div><h2 style="margin-top:0">Kompetenzerwartungen</h2><p class="muted small">Wortlaut des Kernlehrplans (LK). Darunter die Stichworte, die du erklären können solltest – bzw. die Urteilsfrage mit Argumenten. Schätze dich bei jeder Erwartung ein.</p>';
+  h+='<div class="sp-layout"><div>';
+  h+=dossierHtml(sp);
+  h+='<h2 style="margin-top:18px">Kompetenzerwartungen</h2><p class="muted small">Wortlaut des Kernlehrplans (LK). Darunter die Stichworte, die du erklären können solltest – bzw. die Urteilsfrage mit Argumenten. Schätze dich bei jeder Erwartung ein.</p>';
   h+=sp.ke.map(keHtml).join('');
   h+='<h2>Hilfen – nimm nur, was du brauchst</h2>';
   h+='<details class="help"><summary>Begriffe klären <span class="lvlbadge">Stufe 1</span></summary><div><ul class="tight">'+sp.hilfe.b.map(b=>'<li><b>'+b[0]+'</b> – '+b[1]+'</li>').join('')+'</ul><p class="small" style="margin-top:8px"><a href="#/lexikon">Alle Begriffe im Lexikon</a></p></div></details>';
@@ -187,9 +224,28 @@ function vZL(){
 function lexList(){const q=LXF.q.trim().toLowerCase();const list=LEX.filter(l=>(!LXF.bel||l[3])&&(!LXF.if||l[2]===LXF.if)&&(!q||(l[0]+' '+l[1]).toLowerCase().indexOf(q)>-1)).sort((a,b)=>a[0].replace(/[„“]/g,'').localeCompare(b[0].replace(/[„“]/g,''),'de'));
   if(!list.length)return '<p class="muted">Kein Begriff gefunden. Tipp: Suche nach einem Wortteil, z. B. „frieden“.</p>';
   return '<p class="small muted">'+list.length+' Begriffe</p><div class="lex">'+list.map(l=>'<div class="lexitem'+(l[3]?' bel':'')+'"><span class="w">'+l[0]+'</span>'+(l[3]?'<span class="bm">belastet</span>':'')+'<span class="chip" style="margin-left:6px;padding:0 7px">IF '+l[2]+'</span><div class="df">'+l[1]+'</div>'+(l[4]?'<div class="hn">'+l[4]+'</div>':'')+'</div>').join('')+'</div>';}
+
+function dossierLexList(){
+  const q=LXF.q.trim().toLowerCase();
+  let list=SP.filter(s=>s.dossier&&(!LXF.if||s.if===LXF.if));
+  if(q){
+    list=list.filter(s=>{
+      const d=s.dossier;
+      const hay=(s.t+' '+s.short+' '+d.ueberblick+' '+(d.hook?d.hook.zitat:'')+' '+(d.kontroverse?d.kontroverse.name:'')+' '+(d.abiSpotlight?d.abiSpotlight.fokusTipp:'')).toLowerCase();
+      return hay.indexOf(q)>-1;
+    });
+  }
+  if(!list.length)return '<p class="muted">Kein Schwerpunkt-Dossier zu diesem Suchbegriff gefunden.</p>';
+  return '<p class="small muted">'+list.length+' Dossiers gefunden</p><div class="dossier-lex-list">'+list.map(sp=>{
+    const d=sp.dossier;
+    return '<article class="card dossier-lex-card" style="margin-bottom:16px"><div class="row" style="margin-bottom:8px;gap:8px"><span class="chip sk">IF '+sp.if+'</span><b style="font-size:16px;color:var(--heading)">'+esc(sp.t)+'</b>'+(sp.lk?'<span class="chip" style="background:#5e17eb;color:#fff">Nur LK</span>':'')+(sp.fokus.length?'<span class="chip fokus">★ Fokus</span>':'')+'<span class="spacer"></span><a class="btn sm primary" href="#/sp/'+sp.id+'">Zum Schwerpunkt →</a></div>'+(d.hook?'<blockquote class="dossier-hook" style="margin:8px 0"><p class="dossier-quote small">„'+esc(d.hook.zitat)+'“</p><cite class="dossier-cite small">— '+esc(d.hook.quelle)+'</cite></blockquote>':'')+'<details><summary class="small muted" style="cursor:pointer;margin:6px 0">Überblick, Kontroverse &amp; Quellen lesen</summary><div style="margin-top:10px"><div class="dossier-text small">'+d.ueberblick.split('\n\n').map(p=>'<p>'+esc(p)+'</p>').join('')+'</div>'+(d.abiSpotlight?'<div class="note small" style="margin:8px 0"><b>Abitur-Spotlight:</b> '+esc(d.abiSpotlight.fokusTipp)+'</div>':'')+(d.kontroverse?'<div class="dossier-kontroverse small" style="margin:8px 0;background:var(--surface-2);padding:10px;border-radius:8px"><b>Wissenschaftliche Kontroverse: '+esc(d.kontroverse.name)+'</b><p style="margin:4px 0"><b>These:</b> '+esc(d.kontroverse.these)+'</p><p style="margin:4px 0"><b>Gegenposition:</b> '+esc(d.kontroverse.gegenposition)+'</p></div>':'')+(d.quellen&&d.quellen.length?'<div class="source-tags" style="margin-top:8px">'+d.quellen.map(q=>'<a class="source-tag" href="'+esc(q.url)+'" target="_blank" rel="noopener"><span class="name">'+esc(q.name)+'</span><span class="inst">'+esc(q.institution)+' ↗</span></a>').join('')+'</div>':'')+'</div></details></article>';
+  }).join('')+'</div>';
+}
+
 function vLex(){
-  let h=phead('Begriffslexikon','Fachbegriffe sicher verwenden','Fachsprache zählt in der Darstellungsleistung. Zeitgenössisch belastete Begriffe sind markiert – setze sie in Anführungszeichen und ordne sie kritisch ein.');
-  h+='<div class="row noprint" style="margin-bottom:14px"><label for="lexq" class="sr">Begriff suchen</label><input id="lexq" class="search" type="search" placeholder="Begriff suchen …" value="'+esc(LXF.q)+'" data-act="lexq"><button class="chip" data-act="lexbel" aria-pressed="'+LXF.bel+'">nur belastete Begriffe</button>'+[0,4,5,6,7].map(n=>'<button class="chip" data-act="lexif" data-v="'+n+'" aria-pressed="'+(LXF.if===n)+'">'+(n?'IF '+n:'Alle IF')+'</button>').join('')+'</div><div id="lexlist">'+lexList()+'</div>';
+  let h=phead('Begriffslexikon & Fachdossiers','Fachbegriffe & historische Schwerpunkte fundiert erschließen','Fachsprache zählt in der Darstellungsleistung. Die Fachdossiers bieten dir vertiefte historische Überblicke, Kontroversen und verifizierte Fachquellen für das Zentralabitur 2027.');
+  h+='<div class="row noprint" style="margin-bottom:12px;gap:8px"><button class="btn sm'+(LXF.tab==='begriffe'?' primary':'')+'" data-act="lextab" data-v="begriffe">Fachbegriffe ('+LEX.length+')</button><button class="btn sm'+(LXF.tab==='dossiers'?' primary':'')+'" data-act="lextab" data-v="dossiers">Schwerpunkt-Dossiers (14)</button></div>';
+  h+='<div class="row noprint" style="margin-bottom:14px"><label for="lexq" class="sr">Suchen</label><input id="lexq" class="search" type="search" placeholder="'+(LXF.tab==='begriffe'?'Begriff suchen …':'Dossier durchsuchen (z.B. Bismarck, Stalinnote, Keynes, 1848) …')+'" value="'+esc(LXF.q)+'" data-act="lexq">'+(LXF.tab==='begriffe'?'<button class="chip" data-act="lexbel" aria-pressed="'+LXF.bel+'">nur belastete Begriffe</button>':'')+''+[0,4,5,6,7].map(n=>'<button class="chip" data-act="lexif" data-v="'+n+'" aria-pressed="'+(LXF.if===n)+'">'+(n?'IF '+n:'Alle IF')+'</button>').join('')+'</div><div id="lexlist">'+(LXF.tab==='begriffe'?lexList():dossierLexList())+'</div>';
   return h+foot();
 }
 
@@ -312,6 +368,7 @@ document.addEventListener('click',e=>{
     case 'ordnew':newOrder();render(true);break;
     case 'lexbel':LXF.bel=!LXF.bel;render(true);break;
     case 'lexif':LXF.if=+b.dataset.v;render(true);break;
+    case 'lextab':LXF.tab=b.dataset.v;render(true);break;
     case 'sesstart':startSession();if(!SES.q.length){SES=null;toast('Keine Karten in dieser Auswahl fällig – wähle einen anderen Stapel.');}render(false);break;
     case 'cflip':SES.flip=true;render(true);break;
     case 'cok':answer(true);break;
@@ -342,7 +399,7 @@ let noteT;
 document.addEventListener('input',e=>{
   const t=e.target;const a=t.dataset&&t.dataset.act;
   if(a==='note'){clearTimeout(noteT);noteT=setTimeout(()=>{S.n[t.dataset.sp]=t.value;save();},400);}
-  else if(a==='lexq'){LXF.q=t.value;$('#lexlist').innerHTML=lexList();}
+  else if(a==='lexq'){LXF.q=t.value;$('#lexlist').innerHTML=(LXF.tab==='begriffe'?lexList():dossierLexList());}
 });
 document.addEventListener('keydown',e=>{
   if(route().v!=='karten'||!SES||SES.i>=SES.q.length)return;

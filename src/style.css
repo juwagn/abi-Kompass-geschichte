@@ -302,6 +302,44 @@ textarea.code{width:100%;min-height:120px;border:1px solid var(--rule-strong);bo
 .kp-ke .boxes4 span{width:15px;height:15px;border:1.5px solid var(--muted);border-radius:3px;display:inline-block}
 .kp-ke .boxes4 span.on{background:var(--blue);border-color:var(--blue)}
 
+/* ---------- Dossier-Komponenten ---------- */
+.dossier-card{border-left:4px solid var(--navy);margin-bottom:20px;transition:box-shadow .2s ease}
+.dossier-card[open]{box-shadow:var(--shadow)}
+.dossier-summary{cursor:pointer;list-style:none;user-select:none;outline:none}
+.dossier-summary::-webkit-details-marker{display:none}
+.dossier-content{animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+.dossier-hook{margin:0 0 14px;padding:12px 16px;background:var(--surface-2);border-left:4px solid var(--gold);border-radius:0 8px 8px 0}
+.dossier-quote{font-family:var(--f-serif);font-style:italic;font-size:16px;line-height:1.55;color:var(--heading);margin:0}
+.dossier-cite{display:block;margin-top:6px;font-family:var(--f-label);font-size:12px;font-weight:600;letter-spacing:.3px;color:var(--muted);font-style:normal}
+.dossier-q{font-family:var(--f-serif);font-size:15px;line-height:1.5;color:var(--heading);background:var(--gold-soft);border:1px solid var(--gold-rule);padding:8px 12px;border-radius:8px;margin:12px 0}
+
+.dossier-text{font-size:14.5px;line-height:1.68;color:var(--ink);text-align:justify;hyphens:auto}
+.dossier-text p{margin-bottom:12px}
+
+.dossier-spotlight{background:var(--surface-3);border:1px solid var(--rule-strong);border-radius:10px;padding:14px 16px;margin:16px 0}
+.dossier-spotlight .eb{font-family:var(--f-label);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-ink);font-weight:700;margin-bottom:8px}
+.spotlight-item{font-size:13.5px;line-height:1.55;margin-bottom:8px}
+.spotlight-item:last-child{margin-bottom:0}
+
+.dossier-kontroverse{background:var(--surface-2);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;margin:16px 0}
+.dossier-kontroverse .eb{font-family:var(--f-label);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:4px}
+
+.dossier-sources{margin-top:16px;padding-top:12px;border-top:1px solid var(--rule)}
+.dossier-sources .eb{font-family:var(--f-label);font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px}
+.source-tags{display:flex;flex-wrap:wrap;gap:8px}
+.source-tag{display:inline-flex;flex-direction:column;padding:7px 12px;background:var(--surface);border:1px solid var(--rule);border-radius:8px;text-decoration:none;font-size:12.5px;transition:border-color .15s,transform .15s,background-color .15s}
+.source-tag:hover{border-color:var(--blue);background:var(--surface-2);transform:translateY(-1px)}
+.source-tag .name{font-weight:600;color:var(--heading)}
+.source-tag .inst{font-size:11px;color:var(--muted);margin-top:2px}
+
+.if-dossier-card{border-left:4px solid var(--blue);margin-bottom:14px;background:var(--surface)}
+.if-dossier-sum{cursor:pointer;list-style:none;user-select:none}
+.if-dossier-sum::-webkit-details-marker{display:none}
+
+.dossier-lex-card{border-left:4px solid var(--gold);margin-bottom:16px}
+
 /* ---------- Responsive ---------- */
 @media (max-width:980px){
   .sp-layout{grid-template-columns:minmax(0,1fr)}
@@ -344,8 +382,8 @@ textarea.code{width:100%;min-height:120px;border:1px solid var(--rule-strong);bo
   .page{max-width:none}
   .sp-layout,.dash-top,.grid,.tiles,.lex,.urteil{display:block!important}
   .sp-aside{position:static}
-  .card,.ke,.tile,.lexitem,details.help,.method,.note,.bridge,.weekcard,.urteil .col,tr,.kp-ke,.task{break-inside:avoid;page-break-inside:avoid}
-  .card,.ke,.tile,.lexitem,.method,.note,.bridge,.urteil .col{margin-bottom:8px;box-shadow:none!important}
+  .card,.ke,.tile,.lexitem,details.help,.method,.note,.bridge,.weekcard,.urteil .col,tr,.kp-ke,.task,.dossier-card,.if-dossier-card,.dossier-lex-card,.dossier-spotlight,.dossier-kontroverse{break-inside:avoid;page-break-inside:avoid}
+  .card,.ke,.tile,.lexitem,.method,.note,.bridge,.urteil .col,.dossier-card,.if-dossier-card,.dossier-lex-card{margin-bottom:8px;box-shadow:none!important}
   .bridge,.countdown{background:#fff!important;color:#1f2a3d!important;border:1.5px solid #14375e}
   .bridge .eb,.countdown .eb{color:#8a6a1a!important}
   .bridge b,.countdown .big,.countdown .sub,.countdown .facts{color:#14375e!important}
